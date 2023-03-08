@@ -20,11 +20,7 @@ async def on_ready():
     except Exception as e:
         print(e)
 
-@client.tree.command(name="prompt")
-@app_commands.describe(the_prompt = "What do you want from me?")
-async def respPrompt(interaction: discord.Interaction, the_prompt: str):
-    await interaction.response.send_message("Working on it...")
-
+async def getData(the_prompt):
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=[
@@ -32,7 +28,14 @@ async def respPrompt(interaction: discord.Interaction, the_prompt: str):
         ],
         temperature=0,
     )
-    await interaction.edit_original_response(content=response['choices'][0]['message']['content'])
+    return response['choices'][0]['message']['content']
+@client.tree.command(name="prompt")
+@app_commands.describe(the_prompt = "What do you want from me?")
+async def respPrompt(interaction: discord.Interaction, the_prompt: str):
+    await interaction.response.send_message("Working on it...")
+
+    response = await getData(the_prompt)
+    await interaction.edit_original_response(content=response)
     #await interaction.response.edit_original_response()
 
 
